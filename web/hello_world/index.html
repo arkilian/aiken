@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World - Aiken + Mesh</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎉 Hello World Validator</h1>
+        <p class="subtitle">Usando Aiken + MeshJS (PlutusV3)</p>
+
+        <div class="network-badge">🔧 Preprod Testnet</div>
+
+        <div id="connectSection">
+            <button onclick="connectWallet()">🔗 Conectar Wallet</button>
+        </div>
+
+        <div id="walletInfo" class="card hidden">
+            <h3>📱 Informações da Wallet</h3>
+            <div class="info-row">
+                <span class="label">Endereço:</span>
+                <span class="value" id="walletAddress">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Saldo (ADA):</span>
+                <span class="value" id="walletBalance">-</span>
+            </div>
+        </div>
+
+        <div id="contractSection" class="hidden">
+            <div class="card">
+                <h3>📤 Enviar ADA para o Contrato</h3>
+                <div class="input-group">
+                    <label class="label">Quantidade (ADA):</label>
+                    <input type="number" id="lockAmount" placeholder="Ex: 10" min="1" step="0.1" value="5">
+                </div>
+                <button onclick="lockFunds()">🔒 Bloquear Fundos</button>
+            </div>
+
+            <div class="card">
+                <h3>📥 Desbloquear Fundos do Contrato</h3>
+                <div class="input-group">
+                    <label class="label">Mensagem do Redeemer:</label>
+                    <input type="text" id="redeemerMsg" placeholder="Digite a mensagem..." value="Hello, World!">
+                </div>
+                <button onclick="unlockFunds()">🔓 Desbloquear Fundos</button>
+                <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                    💡 Dica: A mensagem correta é "Hello, World!"
+                </p>
+            </div>
+        </div>
+
+        <div id="txStatus" class="hidden"></div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
