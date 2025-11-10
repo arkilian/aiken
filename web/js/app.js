@@ -1,10 +1,10 @@
-import { Lucid, Blockfrost, fromText, Data } from 'https://cdn.jsdelivr.net/npm/lucid-cardano@0.10.7/web/mod.js';
+import { Lucid, Blockfrost, fromText, Data, Constr } from 'https://unpkg.com/lucid-cardano@0.10.10/web/mod.js';
 
 let lucid;
 let contractAddress;
 let config;
 
-// Dados do validator (você precisa copiar do plutus.json após compilar)
+// Dados do validator (script compilado do plutus.json)
 const validator = {
     type: "PlutusV2",
     script: "58ae01010029800aba2aba1aab9faab9eaab9dab9a48888896600264653001300700198039804000cc01c0092225980099b8748008c01cdd500144c8c96600266e1d20003009375400b13232598009807801456600266e1d2000300b3754601c601e00913371e6eb8c038c030dd5003a450d48656c6c6f2c20576f726c6421008b20148b201a375c601a00260146ea80162c8040c02c004c020dd50014590060c01c004c00cdd5003c52689b2b200201"
@@ -69,6 +69,12 @@ window.connectWallet = async function () {
             config.CARDANO_NETWORK
         );
 
+        console.log('Lucid inicializado com:', {
+            url: config.BLOCKFROST_URL,
+            network: config.CARDANO_NETWORK,
+            apiKeyPresent: !!config.BLOCKFROST_API_KEY
+        });
+
         const api = await wallet.api.enable();
         lucid.selectWallet(api);
 
@@ -89,7 +95,15 @@ window.connectWallet = async function () {
         document.getElementById('contractSection').classList.remove('hidden');
 
         // Calcular endereço do contrato
-        contractAddress = lucid.utils.validatorToAddress(validator);
+        try {
+            contractAddress = lucid.utils.validatorToAddress(validator);
+            console.log('Endereço do contrato calculado:', contractAddress);
+        } catch (error) {
+            console.error('Erro ao calcular endereço do contrato:', error);
+            // Usar endereço fixo conhecido
+            contractAddress = "addr_test1wr253cxwprqqr9cvf6rnwarqkg8dl69r3hesamnrr7vh7pq7cqpxf";
+            console.log('Usando endereço fixo:', contractAddress);
+        }
 
         showStatus('success', '✅ Wallet conectada com sucesso!');
 
@@ -112,19 +126,15 @@ window.lockFunds = async function () {
 
         showStatus('info', '⏳ Criando transação...');
 
-        // Criar o Datum
-        const Datum = Data.Object({
-            owner: Data.Bytes()
-        });
-
+        // Obter o hash da chave pública do proprietário
         const ownerPubKeyHash = lucid.utils.getAddressDetails(
             await lucid.wallet.address()
         ).paymentCredential.hash;
 
-        const datum = Data.to(
-            { owner: ownerPubKeyHash },
-            Datum
-        );
+        // Criar datum como string hexadecimal inline
+        const datum = Data.to(new Constr(0, [ownerPubKeyHash]));
+
+        console.log('Datum criado:', datum);
 
         showStatus('info', '⏳ Construindo transação...');
 
@@ -166,7 +176,13 @@ window.unlockFunds = async function () {
 
         showStatus('info', '⏳ Buscando UTXOs do contrato...');
 
+        console.log('Endereço do contrato:', contractAddress);
+        console.log('Lucid instance:', lucid);
+        console.log('Config:', config);
+
         const scriptUtxos = await lucid.utxosAt(contractAddress);
+
+        console.log('UTXOs encontrados:', scriptUtxos);
 
         if (scriptUtxos.length === 0) {
             showStatus('error', '❌ Nenhum fundo encontrado no contrato');
@@ -175,24 +191,31 @@ window.unlockFunds = async function () {
 
         showStatus('info', `✅ Encontrados ${scriptUtxos.length} UTXO(s). Criando transação de resgate...`);
 
-        // Criar o Redeemer
-        const Redeemer = Data.Object({
-            msg: Data.Bytes()
-        });
+        console.log('Mensagem do redeemer:', message);
 
-        const redeemer = Data.to(
-            { msg: fromText(message) },
-            Redeemer
-        );
+        // Criar o Redeemer serializado corretamente
+        const redeemer = Data.to(new Constr(0, [fromText(message)]));
+
+        console.log('Redeemer criado:', redeemer);
 
         showStatus('info', '⏳ Construindo transação...');
+
+        // Obter o tempo atual para definir a validade da transação
+        const currentTime = Date.now();
+
+        // Endereço da wallet para receber os fundos de volta
+        const walletAddress = await lucid.wallet.address();
 
         const tx = await lucid
             .newTx()
             .collectFrom(scriptUtxos, redeemer)
+            .addSigner(walletAddress)
             .attachSpendingValidator(validator)
+            .validFrom(currentTime)
+            .validTo(currentTime + 180000) // 3 minutos
             .complete();
 
+        console.log('Transação construída com sucesso');
         showStatus('info', '✍️ Aguardando assinatura...');
 
         const signedTx = await tx.sign().complete();
