@@ -7,7 +7,7 @@ let config;
 // Dados do validator (você precisa copiar do plutus.json após compilar)
 const validator = {
     type: "PlutusV2",
-    script: "YOUR_COMPILED_PLUTUS_SCRIPT_HERE" // ⚠️ Substitua pelo script compilado
+    script: "58ae01010029800aba2aba1aab9faab9eaab9dab9a48888896600264653001300700198039804000cc01c0092225980099b8748008c01cdd500144c8c96600266e1d20003009375400b13232598009807801456600266e1d2000300b3754601c601e00913371e6eb8c038c030dd5003a450d48656c6c6f2c20576f726c6421008b20148b201a375c601a00260146ea80162c8040c02c004c020dd50014590060c01c004c00cdd5003c52689b2b200201"
 };
 
 /**
@@ -126,6 +126,8 @@ window.lockFunds = async function () {
             Datum
         );
 
+        showStatus('info', '⏳ Construindo transação...');
+
         const tx = await lucid
             .newTx()
             .payToContract(contractAddress, { inline: datum }, {
@@ -133,14 +135,20 @@ window.lockFunds = async function () {
             })
             .complete();
 
+        showStatus('info', '✍️ Aguardando assinatura...');
+
         const signedTx = await tx.sign().complete();
+
+        showStatus('info', '📤 Enviando transação para a blockchain...');
+
         const txHash = await signedTx.submit();
 
         showStatus('success',
             `✅ Fundos bloqueados com sucesso!<br>
             <a class="tx-link" href="https://preprod.cardanoscan.io/transaction/${txHash}" target="_blank">
                 Ver Transação: ${txHash.substring(0, 20)}...
-            </a>`
+            </a><br>
+            <small>⏱️ Aguarde ~20 segundos para confirmação na blockchain</small>`
         );
 
     } catch (error) {
@@ -165,7 +173,7 @@ window.unlockFunds = async function () {
             return;
         }
 
-        showStatus('info', '⏳ Criando transação de resgate...');
+        showStatus('info', `✅ Encontrados ${scriptUtxos.length} UTXO(s). Criando transação de resgate...`);
 
         // Criar o Redeemer
         const Redeemer = Data.Object({
@@ -177,20 +185,28 @@ window.unlockFunds = async function () {
             Redeemer
         );
 
+        showStatus('info', '⏳ Construindo transação...');
+
         const tx = await lucid
             .newTx()
             .collectFrom(scriptUtxos, redeemer)
             .attachSpendingValidator(validator)
             .complete();
 
+        showStatus('info', '✍️ Aguardando assinatura...');
+
         const signedTx = await tx.sign().complete();
+
+        showStatus('info', '📤 Enviando transação para a blockchain...');
+
         const txHash = await signedTx.submit();
 
         showStatus('success',
             `✅ Fundos desbloqueados com sucesso!<br>
             <a class="tx-link" href="https://preprod.cardanoscan.io/transaction/${txHash}" target="_blank">
                 Ver Transação: ${txHash.substring(0, 20)}...
-            </a>`
+            </a><br>
+            <small>⏱️ Aguarde ~20 segundos para confirmação na blockchain</small>`
         );
 
     } catch (error) {
