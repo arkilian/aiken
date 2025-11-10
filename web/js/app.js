@@ -25,6 +25,26 @@ async function initConfig() {
 }
 
 /**
+ * Detecta wallets disponíveis
+ */
+function getAvailableWallet() {
+    if (!window.cardano) {
+        throw new Error('Nenhuma wallet Cardano detectada. Instale Nami, Eternl, Lace ou Flint.');
+    }
+
+    // Tentar detectar wallets na ordem de preferência
+    const wallets = ['nami', 'eternl', 'lace', 'flint', 'typhon', 'gerowallet'];
+
+    for (const wallet of wallets) {
+        if (window.cardano[wallet]) {
+            return { name: wallet, api: window.cardano[wallet] };
+        }
+    }
+
+    throw new Error('Nenhuma wallet compatível encontrada. Instale Nami, Eternl, Lace ou Flint.');
+}
+
+/**
  * Conecta a wallet do usuário
  */
 window.connectWallet = async function () {
@@ -34,7 +54,12 @@ window.connectWallet = async function () {
             await initConfig();
         }
 
-        showStatus('info', '⏳ Conectando à wallet...');
+        showStatus('info', '⏳ Detectando wallet...');
+
+        // Detectar wallet disponível
+        const wallet = getAvailableWallet();
+
+        showStatus('info', `⏳ Conectando à ${wallet.name.toUpperCase()}...`);
 
         lucid = await Lucid.new(
             new Blockfrost(
@@ -44,7 +69,7 @@ window.connectWallet = async function () {
             config.CARDANO_NETWORK
         );
 
-        const api = await window.cardano.nami.enable();
+        const api = await wallet.api.enable();
         lucid.selectWallet(api);
 
         const address = await lucid.wallet.address();
