@@ -106,7 +106,7 @@ pub type CounterRedeemer {
 validator counter {
   spend(datum: Option<CounterDatum>, redeemer: CounterRedeemer, _utxo, _self) {
     expect Some(dat) = datum
-    
+
     when redeemer is {
       Increment -> True
       Decrement -> dat.count > 0
@@ -174,7 +174,7 @@ pub type VestingRedeemer {
 validator vesting {
   spend(datum: Option<VestingDatum>, _redeemer: VestingRedeemer, _utxo, _self) {
     expect Some(dat) = datum
-    
+
     // Versão simplificada para demonstração
     // Em produção, você verificaria:
     // 1. Assinatura do beneficiário via _self.extra_signatories
