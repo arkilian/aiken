@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World - Aiken Validator</title>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/lucid-cardano@0.10.7/web/mod.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .network-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: #ffc107;
+            color: #333;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .tx-link {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .tx-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎉 Hello World Validator</h1>
+        <p class="subtitle">Interaja com seu primeiro smart contract Aiken</p>
+
+        <div class="network-badge">🔧 Preprod Testnet</div>
+
+        <div id="connectSection">
+            <button onclick="connectWallet()">🔗 Conectar Wallet</button>
+            <div id="walletStatus" class="status info hidden">
+                Conecte sua wallet para começar
+            </div>
+        </div>
+
+        <div id="walletInfo" class="card hidden">
+            <h3>📱 Informações da Wallet</h3>
+            <div class="info-row">
+                <span class="label">Endereço:</span>
+                <span class="value" id="walletAddress">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Saldo (ADA):</span>
+                <span class="value" id="walletBalance">-</span>
+            </div>
+        </div>
+
+        <div id="contractSection" class="hidden">
+            <div class="card">
+                <h3>📤 Enviar ADA para o Contrato</h3>
+                <div class="input-group">
+                    <label class="label">Quantidade (ADA):</label>
+                    <input type="number" id="lockAmount" placeholder="Ex: 10" min="1" step="0.1" value="5">
+                </div>
+                <button onclick="lockFunds()">🔒 Bloquear Fundos</button>
+            </div>
+
+            <div class="card">
+                <h3>📥 Desbloquear Fundos do Contrato</h3>
+                <div class="input-group">
+                    <label class="label">Mensagem do Redeemer:</label>
+                    <input type="text" id="redeemerMsg" placeholder="Digite a mensagem..." value="Hello, World!">
+                </div>
+                <button onclick="unlockFunds()">🔓 Desbloquear Fundos</button>
+                <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
+                    💡 Dica: A mensagem correta é "Hello, World!"
+                </p>
+            </div>
+        </div>
+
+        <div id="txStatus" class="hidden"></div>
+    </div>
+
+    <script type="module">
+        import { Lucid, Blockfrost, fromText, Data } from 'https://cdn.jsdelivr.net/npm/lucid-cardano@0.10.7/web/mod.js';
+
+        let lucid;
+        let contractAddress;
+
+        // Configuração do Blockfrost (você precisa adicionar sua API key)
+        const BLOCKFROST_URL = "https://cardano-preprod.blockfrost.io/api/v0";
+        const BLOCKFROST_API_KEY = "preprodYOUR_API_KEY_HERE"; // ⚠️ Substitua pela sua API key
+
+        // Dados do validator (você precisa copiar do plutus.json após compilar)
+        const validator = {
+            type: "PlutusV2",
+            script: "YOUR_COMPILED_PLUTUS_SCRIPT_HERE" // ⚠️ Substitua pelo script compilado
+        };
+
+        window.connectWallet = async function () {
+            try {
+                showStatus('info', '⏳ Conectando à wallet...');
+
+                lucid = await Lucid.new(
+                    new Blockfrost(BLOCKFROST_URL, BLOCKFROST_API_KEY),
+                    "Preprod"
+                );
+
+                const api = await window.cardano.nami.enable();
+                lucid.selectWallet(api);
+
+                const address = await lucid.wallet.address();
+                const utxos = await lucid.wallet.getUtxos();
+
+                let totalLovelace = 0n;
+                utxos.forEach(utxo => {
+                    totalLovelace += utxo.assets.lovelace;
+                });
+
+                document.getElementById('walletAddress').textContent =
+                    address.substring(0, 20) + '...' + address.substring(address.length - 10);
+                document.getElementById('walletBalance').textContent =
+                    (Number(totalLovelace) / 1_000_000).toFixed(2) + ' ADA';
+
+                document.getElementById('walletInfo').classList.remove('hidden');
+                document.getElementById('contractSection').classList.remove('hidden');
+
+                // Calcular endereço do contrato
+                contractAddress = lucid.utils.validatorToAddress(validator);
+
+                showStatus('success', '✅ Wallet conectada com sucesso!');
+
+            } catch (error) {
+                console.error('Erro ao conectar wallet:', error);
+                showStatus('error', '❌ Erro: ' + error.message);
+            }
+        }
+
+        window.lockFunds = async function () {
+            try {
+                const amount = document.getElementById('lockAmount').value;
+                if (!amount || amount <= 0) {
+                    showStatus('error', '❌ Digite uma quantidade válida');
+                    return;
+                }
+
+                showStatus('info', '⏳ Criando transação...');
+
+                // Criar o Datum
+                const Datum = Data.Object({
+                    owner: Data.Bytes()
+                });
+
+                const ownerPubKeyHash = lucid.utils.getAddressDetails(
+                    await lucid.wallet.address()
+                ).paymentCredential.hash;
+
+                const datum = Data.to(
+                    { owner: ownerPubKeyHash },
+                    Datum
+                );
+
+                const tx = await lucid
+                    .newTx()
+                    .payToContract(contractAddress, { inline: datum }, {
+                        lovelace: BigInt(amount * 1_000_000)
+                    })
+                    .complete();
+
+                const signedTx = await tx.sign().complete();
+                const txHash = await signedTx.submit();
+
+                showStatus('success',
+                    `✅ Fundos bloqueados com sucesso!<br>
+                    <a class="tx-link" href="https://preprod.cardanoscan.io/transaction/${txHash}" target="_blank">
+                        Ver Transação: ${txHash.substring(0, 20)}...
+                    </a>`
+                );
+
+            } catch (error) {
+                console.error('Erro ao bloquear fundos:', error);
+                showStatus('error', '❌ Erro: ' + error.message);
+            }
+        }
+
+        window.unlockFunds = async function () {
+            try {
+                const message = document.getElementById('redeemerMsg').value;
+
+                showStatus('info', '⏳ Buscando UTXOs do contrato...');
+
+                const scriptUtxos = await lucid.utxosAt(contractAddress);
+
+                if (scriptUtxos.length === 0) {
+                    showStatus('error', '❌ Nenhum fundo encontrado no contrato');
+                    return;
+                }
+
+                showStatus('info', '⏳ Criando transação de resgate...');
+
+                // Criar o Redeemer
+                const Redeemer = Data.Object({
+                    msg: Data.Bytes()
+                });
+
+                const redeemer = Data.to(
+                    { msg: fromText(message) },
+                    Redeemer
+                );
+
+                const tx = await lucid
+                    .newTx()
+                    .collectFrom(scriptUtxos, redeemer)
+                    .attachSpendingValidator(validator)
+                    .complete();
+
+                const signedTx = await tx.sign().complete();
+                const txHash = await signedTx.submit();
+
+                showStatus('success',
+                    `✅ Fundos desbloqueados com sucesso!<br>
+                    <a class="tx-link" href="https://preprod.cardanoscan.io/transaction/${txHash}" target="_blank">
+                        Ver Transação: ${txHash.substring(0, 20)}...
+                    </a>`
+                );
+
+            } catch (error) {
+                console.error('Erro ao desbloquear fundos:', error);
+                showStatus('error', '❌ Erro: ' + error.message +
+                    (message !== "Hello, World!" ? '<br>💡 Verifique se a mensagem está correta!' : ''));
+            }
+        }
+
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('txStatus');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+            statusDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>
