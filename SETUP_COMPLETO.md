@@ -116,7 +116,7 @@ Aiken Language Server client: couldn't create connection to server
 O arquivo `.vscode/settings.json` já tem o caminho do Aiken:
 ```json
 {
-  "aiken.aikenPath": "C:\\Users\\diogo\\.cargo\\bin\\aiken.exe"
+  "aiken.aikenPath": "<CAMINHO_DO_AIKEN>"
 }
 ```
 
