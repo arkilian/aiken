@@ -39,14 +39,14 @@ pub fn multiplicar(a: Int, b: Int) -> Int {
 
 ### Tipos / Types
 ```aiken
-// Record
-type Pessoa {
+// Record (sempre use pub para validators)
+pub type Pessoa {
   nome: ByteArray,
   idade: Int,
 }
 
 // Enum
-type Resultado {
+pub type Resultado {
   Sucesso { valor: Int }
   Erro { mensagem: ByteArray }
 }
@@ -73,32 +73,51 @@ let soma = list.foldl(nums, 0, fn(acc, x) { acc + x })
 
 ### Estrutura Básica / Basic Structure
 ```aiken
-validator {
-  fn meu_validador(
-    datum: MeuDatum,
-    redeemer: MeuRedeemer,
-    context: ScriptContext
-  ) -> Bool {
+pub type MeuDatum {
+  owner: ByteArray,
+  value: Int,
+}
+
+pub type MeuRedeemer {
+  action: ByteArray,
+}
+
+validator meu_validador {
+  spend(datum: Option<MeuDatum>, redeemer: MeuRedeemer, _utxo, _self) {
+    // Extrair datum
+    expect Some(dat) = datum
+    
     // Lógica de validação
-    True
+    dat.value > 0 && redeemer.action == "approve"
+  }
+
+  else(_) {
+    fail
   }
 }
 ```
 
-### Verificar Assinatura / Check Signature
+### Múltiplos Propósitos / Multiple Purposes
 ```aiken
-use aiken/list
-use aiken/transaction.{ScriptContext}
+validator multi_purpose {
+  spend(datum: Option<MyDatum>, redeemer: MyRedeemer, _utxo, _self) {
+    // Lógica para gastar
+    True
+  }
 
-let must_be_signed = 
-  list.has(context.transaction.extra_signatories, owner)
-```
+  mint(_redeemer, _policy_id, _self) {
+    // Lógica para cunhar tokens
+    True
+  }
 
-### Verificar Tempo / Check Time
-```aiken
-let deadline_passed = when context.transaction.validity_range.lower_bound.bound_type is {
-  Finite(time) -> time >= deadline
-  _ -> False
+  withdraw(_redeemer, _account, _self) {
+    // Lógica para saques de stake
+    True
+  }
+
+  else(_) {
+    fail
+  }
 }
 ```
 
@@ -109,28 +128,37 @@ test soma_funciona() {
   somar(2, 3) == 5
 }
 
-test nome_descritivo() {
-  let resultado = minha_funcao(args)
-  resultado == valor_esperado
+test validator_aceita_correto() {
+  let datum = Some(MeuDatum { value: 100 })
+  let redeemer = MeuRedeemer { action: "approve" }
+  
+  // Use Void para parâmetros não usados
+  meu_validador.spend(datum, redeemer, Void, Void)
+}
+
+test validator_rejeita_incorreto() {
+  let datum = Some(MeuDatum { value: 0 })
+  let redeemer = MeuRedeemer { action: "reject" }
+  
+  // Use ! para testar que deve falhar
+  !meu_validador.spend(datum, redeemer, Void, Void)
 }
 ```
 
 ## 📚 Imports Comuns / Common Imports
 
 ```aiken
-// Hash e criptografia / Hash and cryptography
-use aiken/hash.{Blake2b_224, Hash}
+// Coleções / Collections
+use aiken/collection/list
+use aiken/collection/dict
 
-// Transações / Transactions
-use aiken/transaction.{ScriptContext, Spend}
-use aiken/transaction/credential.{VerificationKey}
-
-// Listas / Lists
-use aiken/list
-
-// Valores / Values
-use aiken/transaction/value
+// Cardano (nova estrutura v1.1.19+)
+use cardano/address.{Address, Script}
+use cardano/transaction.{Transaction, OutputReference}
+use cardano/assets.{PolicyId}
 ```
+
+**Nota:** A partir do Aiken 1.1.19, módulos core mudaram de `aiken/` para `cardano/`.
 
 ## 🎯 Dicas / Tips
 
@@ -155,23 +183,44 @@ use aiken/transaction/value
 
 ❌ **Evite / Avoid:**
 ```aiken
-// Sem verificação de condições
-validator {
-  fn inseguro(datum, redeemer, ctx) -> Bool {
-    True  // Aceita tudo!
-  }
+// Tipos privados em validators
+type MeuDatum {  // ❌ Faltando 'pub'
+  value: Int,
+}
+
+// Validator sem propósitos definidos
+validator inseguro {
+  // ❌ Sem handlers (spend, mint, etc.)
+}
+
+// Usar todo em testes
+test meu_teste() {
+  meu_validator.spend(datum, redeemer, todo, todo)  // ❌
 }
 ```
 
 ✅ **Faça / Do:**
 ```aiken
-// Com validações apropriadas
-validator {
-  fn seguro(datum, redeemer, ctx) -> Bool {
-    let assinado = list.has(ctx.transaction.extra_signatories, datum.owner)
-    let valor_correto = ctx.transaction.value == datum.expected_value
-    assinado && valor_correto
+// Tipos públicos
+pub type MeuDatum {  // ✅
+  value: Int,
+}
+
+// Validator com propósitos e else
+validator seguro {
+  spend(datum: Option<MeuDatum>, redeemer: MeuRedeemer, _utxo, _self) {
+    expect Some(dat) = datum
+    dat.value > 0
   }
+
+  else(_) {
+    fail
+  }
+}
+
+// Usar Void em testes
+test meu_teste() {
+  meu_validator.spend(datum, redeemer, Void, Void)  // ✅
 }
 ```
 

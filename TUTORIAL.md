@@ -71,15 +71,22 @@ projeto/
     â””â”€â”€ seu_validador.ak
 ```
 
-### O que sÃ£o Validadores? / What are Validators?
+### O que são Validadores? / What are Validators?
 
-Validadores sÃ£o smart contracts que verificam se uma transaÃ§Ã£o Ã© vÃ¡lida. Eles recebem trÃªs argumentos:
+Validadores são smart contracts que verificam se uma transação é válida. Na versão moderna do Aiken (1.1.19+), eles usam múltiplos propósitos (handlers) e recebem diferentes parâmetros dependendo do propósito:
 
-*Validators are smart contracts that check if a transaction is valid. They receive three arguments:*
+*Validators are smart contracts that check if a transaction is valid. In modern Aiken (1.1.19+), they use multiple purposes (handlers) and receive different parameters depending on the purpose:*
 
-1. **Datum**: Dados armazenados no UTxO
-2. **Redeemer**: Dados fornecidos por quem gasta o UTxO
-3. **ScriptContext**: InformaÃ§Ãµes sobre a transaÃ§Ã£o
+**Para `spend` (gastar UTxOs):**
+1. **datum: Option<T>**: Dados armazenados no UTxO (opcional)
+2. **redeemer: R**: Dados fornecidos por quem gasta o UTxO
+3. **_utxo: OutputReference**: Referência ao UTxO sendo gasto
+4. **_self: Transaction**: Informações sobre a transação completa
+
+**Para `mint` (cunhar tokens):**
+1. **redeemer**: Dados de cunhagem
+2. **policy_id**: ID da política de cunhagem
+3. **self**: Transação
 
 ## Primeiro Validador / First Validator
 
@@ -90,19 +97,35 @@ Veja o arquivo `validators/hello_world.ak` para um exemplo completo.
 *See the `validators/hello_world.ak` file for a complete example.*
 
 ```aiken
-validator {
-  fn hello_world(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
-    let must_say_hello = redeemer.msg == "Hello, World!"
-    must_say_hello
+pub type Datum {
+  owner: ByteArray,
+}
+
+pub type Redeemer {
+  msg: ByteArray,
+}
+
+validator hello_world {
+  spend(datum: Option<Datum>, redeemer: Redeemer, _utxo, _self) {
+    expect Some(_dat) = datum
+    redeemer.msg == "Hello, World!"
+  }
+
+  else(_) {
+    fail
   }
 }
 ```
 
 Este validador:
-- Aceita transaÃ§Ãµes onde o redeemer contÃ©m "Hello, World!"
-- Rejeita todas as outras transaÃ§Ãµes
+- Aceita transações onde o redeemer contém "Hello, World!"
+- Rejeita todas as outras transações
+- Usa a nova sintaxe do Aiken 1.1.19 com múltiplos propósitos
 
 *This validator:*
+- *Accepts transactions where the redeemer contains "Hello, World!"*
+- *Rejects all other transactions*
+- *Uses the new Aiken 1.1.19 syntax with multiple purposes*
 - *Accepts transactions where the redeemer contains "Hello, World!"*
 - *Rejects all other transactions*
 
@@ -128,17 +151,19 @@ let numeros: List<Int> = [1, 2, 3, 4, 5]
 
 ```aiken
 // Record type (como struct)
-type Pessoa {
+pub type Pessoa {
   nome: ByteArray,
   idade: Int,
 }
 
-// Enum type (uniÃ£o de tipos)
-type Acao {
+// Enum type (união de tipos)
+pub type Acao {
   Depositar
   Sacar { quantidade: Int }
 }
 ```
+
+**Importante:** Tipos usados em validators devem ser `pub` (públicos).
 
 ## Testes / Testing
 
@@ -154,6 +179,14 @@ test meu_teste() {
   
   // Assert (verificar)
   resultado == 15
+}
+
+test validator_teste() {
+  let datum = Some(MeuDatum { campo: 10 })
+  let redeemer = MeuRedeemer { acao: Incrementar }
+  
+  // Use Void para parâmetros não utilizados
+  meu_validator.spend(datum, redeemer, Void, Void)
 }
 ```
 
@@ -226,6 +259,26 @@ fn processar_acao(acao: Acao) -> Int {
   when acao is {
     Depositar -> 100
     Sacar { quantidade } -> quantidade
+  }
+}
+```
+
+### Validators com Múltiplos Propósitos
+
+```aiken
+validator meu_validator {
+  spend(datum: Option<MeuDatum>, redeemer: MeuRedeemer, _utxo, _self) {
+    // Lógica para gastar UTxOs
+    True
+  }
+
+  mint(_redeemer, _policy_id, _self) {
+    // Lógica para cunhar tokens
+    True
+  }
+
+  else(_) {
+    fail
   }
 }
 ```

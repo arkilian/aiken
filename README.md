@@ -20,8 +20,12 @@ Aiken é uma linguagem de programação moderna, estaticamente tipada e funciona
 │   └── aiken_learning/
 │       └── utils.ak    # Funções utilitárias / Utility functions
 └── validators/         # Validadores de smart contract / Smart contract validators
-    └── hello_world.ak  # Exemplo "Hello, World!" / "Hello, World!" example
+    ├── hello_world.ak  # Exemplo "Hello, World!" / "Hello, World!" example
+    ├── counter.ak      # Contador com estado / Counter with state
+    └── vesting.ak      # Bloqueio temporal / Time-lock vesting
 ```
+
+**Versão do Aiken:** 1.1.19+ (sintaxe atualizada)
 
 ## Pré-requisitos / Prerequisites
 
@@ -31,6 +35,21 @@ Para trabalhar com este projeto, você precisa instalar o Aiken. Siga as instru�
 
 ### Instalação / Installation
 
+**Windows:**
+```powershell
+# 1. Instalar Rust via winget
+winget install rustup
+
+# 2. Recarregar variáveis de ambiente
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# 3. Instalar Aiken via Cargo
+cargo install aiken --locked
+
+# 4. Verificar instalação
+aiken --version
+```
+
 **Linux/MacOS:**
 ```bash
 curl -sSfL https://install.aiken-lang.org | bash
@@ -39,7 +58,7 @@ aikup
 
 **Ou via Cargo (todas as plataformas) / Or via Cargo (all platforms):**
 ```bash
-cargo install aiken
+cargo install aiken --locked
 ```
 
 **Verificar instalação / Verify installation:**
@@ -99,10 +118,15 @@ O arquivo `lib/aiken_learning/utils.ak` contém funções utilitárias básicas 
 
 1. ✅ Configurar o projeto básico / Set up basic project
 2. ✅ Criar validador "Hello, World!" / Create "Hello, World!" validator
-3. ✅ Adicionar testes / Add tests
-4. 📚 Estudar a documentação oficial / Study the official documentation
-5. 🔨 Praticar criando validadores mais complexos / Practice creating more complex validators
-6. 🎯 Explorar exemplos da comunidade / Explore community examples
+3. ✅ Criar validador Counter / Create Counter validator
+4. ✅ Criar validador Vesting / Create Vesting validator
+5. ✅ Adicionar testes / Add tests
+6. ✅ Atualizar para sintaxe Aiken 1.1.19+ / Update to Aiken 1.1.19+ syntax
+7. 📚 Estudar a documentação oficial / Study the official documentation
+8. 🔨 Praticar criando validadores mais complexos / Practice creating more complex validators
+9. 🎯 Explorar exemplos da comunidade / Explore community examples
+
+**Status:** Projeto funcionando com Aiken 1.1.19 - todos os testes passando! ✅
 
 ## Licença / License
 
