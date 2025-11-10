@@ -37,8 +37,8 @@ if ($System) {
     Write-Host "Adicionando ao PATH do Sistema (requer Administrator)..." -ForegroundColor Yellow
     try {
         $systemPath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
-        if ($systemPath -notlike "*$cargoPath*") {
-            [System.Environment]::SetEnvironmentVariable("Path", "$systemPath;$cargoPath", "Machine")
+        if ($systemPath -notlike "*cargo\bin*") {
+            [System.Environment]::SetEnvironmentVariable("Path", "$systemPath;%USERPROFILE%\.cargo\bin", "Machine")
             Write-Host "✅ Adicionado ao PATH do Sistema" -ForegroundColor Green
         } else {
             Write-Host "✅ Já estava no PATH do Sistema" -ForegroundColor Green
@@ -51,8 +51,8 @@ if ($System) {
     Write-Host ""
     Write-Host "Adicionando ao PATH do Usuário..." -ForegroundColor Yellow
     $userPath = [System.Environment]::GetEnvironmentVariable("Path", "User")
-    if ($userPath -notlike "*$cargoPath*") {
-        [System.Environment]::SetEnvironmentVariable("Path", "$userPath;$cargoPath", "User")
+    if ($userPath -notlike "*cargo\bin*") {
+        [System.Environment]::SetEnvironmentVariable("Path", "$userPath;%USERPROFILE%\.cargo\bin", "User")
         Write-Host "✅ Adicionado ao PATH do Usuário" -ForegroundColor Green
     } else {
         Write-Host "✅ Já estava no PATH do Usuário" -ForegroundColor Green

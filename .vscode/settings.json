@@ -1,0 +1,53 @@
+{
+  // Configurações de encoding para garantir UTF-8
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false,
+  // Caminho do executável Aiken (usa variável de ambiente)
+  // Se não funcionar, substitua ${env:USERPROFILE} pelo seu caminho
+  "aiken.aikenPath": "${env:USERPROFILE}\\.cargo\\bin\\aiken.exe",
+  // Configurações específicas para Aiken
+  "[aiken]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "txpipe.aiken",
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  // Associar extensões .ak com a linguagem Aiken
+  "files.associations": {
+    "*.ak": "aiken"
+  },
+  // Formatação automática
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  // Configurações de fim de linha
+  "files.eol": "\n",
+  // Remover espaços em branco no final das linhas
+  "files.trimTrailingWhitespace": true,
+  // Adicionar nova linha no final do arquivo
+  "files.insertFinalNewline": true,
+  // Highlighting de sintaxe
+  "editor.semanticHighlighting.enabled": true,
+  // Sugestões de código
+  "editor.suggestSelection": "first",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  // Terminal com UTF-8 e PATH do Cargo (usa variável de ambiente)
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "$env:Path += \";$env:USERPROFILE\\.cargo\\bin\"; chcp 65001"
+      ]
+    }
+  },
+  // Variáveis de ambiente para o terminal
+  "terminal.integrated.env.windows": {
+    "PATH": "${env:PATH};${env:USERPROFILE}\\.cargo\\bin"
+  }
+}

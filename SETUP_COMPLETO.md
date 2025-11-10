@@ -139,7 +139,7 @@ O arquivo `.vscode/settings.json` já tem o caminho do Aiken:
    ```powershell
    # No terminal integrado:
    where.exe aiken
-   # Deve mostrar: C:\Users\diogo\.cargo\bin\aiken.exe
+   # Deve mostrar: %USERPROFILE%\.cargo\bin\aiken.exe
    ```
 
 ### Problema: Caracteres especiais aparecem como ��

@@ -2,13 +2,19 @@
 # These are generated when you run 'aiken build'
 plutus.json
 artifacts/
+build/
 
 # Aiken package directory
 # This contains downloaded dependencies
 packages/
 
 # Editor and IDE files
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+.vscode/*.local.json
+.vscode/settings.local.json
 .idea/
 *.swp
 *.swo
@@ -21,3 +27,35 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.secret
+secrets/
+private/
+
+# Logs
+*.log
+logs/
+
+# Node modules (se usar ferramentas JS)
+node_modules/
+
+# Python (se usar ferramentas Python)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+ENV/
+
+# Rust/Cargo
+target/
+Cargo.lock
+
+# Backup files
+*.bak
+*.backup

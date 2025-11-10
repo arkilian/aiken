@@ -167,7 +167,7 @@ Para resolver problemas de PATH permanentemente, use o script fornecido:
 
 O script:
 - ✅ Verifica se o Aiken está instalado
-- ✅ Adiciona `C:\Users\diogo\.cargo\bin` ao PATH
+- ✅ Adiciona `%USERPROFILE%\.cargo\bin` ao PATH
 - ✅ Testa se o comando `aiken` funciona
 - ✅ Salva permanentemente (não precisa configurar de novo)
 
