@@ -4,7 +4,7 @@ Este tutorial guia você através dos fundamentos do Aiken, baseado na documenta
 
 *This tutorial guides you through the fundamentals of Aiken, based on the official documentation.*
 
-## Índice / Table of Contents
+## Ýndice / Table of Contents
 
 1. [Instalação / Installation](#instalação--installation)
 2. [Conceitos Básicos / Basic Concepts](#conceitos-básicos--basic-concepts)
@@ -13,7 +13,7 @@ Este tutorial guia você através dos fundamentos do Aiken, baseado na documenta
 5. [Testes / Testing](#testes--testing)
 6. [Próximos Passos / Next Steps](#próximos-passos--next-steps)
 
-## Instalação / Installation
+## Instala��o / Installation
 
 ### 1. Instalar Aiken / Install Aiken
 
@@ -23,14 +23,39 @@ curl -sSfL https://install.aiken-lang.org | bash
 aikup
 ```
 
-**Windows ou via Cargo:**
-```bash
-cargo install aiken
+**Windows:**
+
+Primeiro, instale o Rust (se ainda n�o tiver):
+```powershell
+# Instalar Rust via winget
+winget install rustup
+
+# Recarregar as vari�veis de ambiente
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Verificar instala��o do Rust
+rustup --version
+cargo --version
 ```
 
-### 2. Verificar Instalação / Verify Installation
+Depois, instale o Aiken via Cargo:
+```powershell
+cargo install aiken --locked
+```
+
+**Alternativa (qualquer plataforma via Cargo):**
+```bash
+cargo install aiken --locked
+```
+
+### 2. Verificar Instala��o / Verify Installation
 ```bash
 aiken --version
+```
+
+**Nota para Windows:** Se o comando `cargo` n�o for reconhecido em uma nova janela do PowerShell, execute:
+```powershell
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 ```
 
 ## Conceitos Básicos / Basic Concepts
