@@ -9,7 +9,11 @@ web/
 ├── css/
 │   └── styles.css      # Estilos da aplicação
 ├── js/
-│   └── app.js          # Lógica de interação com blockchain
+│   ├── app.js          # Lógica de interação com blockchain
+│   └── env.js          # Carregador de variáveis de ambiente
+├── .env                # Variáveis de ambiente (NÃO committar)
+├── .env.example        # Exemplo de configuração
+├── .gitignore          # Arquivos ignorados pelo git
 ├── index.html          # Interface do usuário
 └── README.md           # Este arquivo
 ```
@@ -29,7 +33,23 @@ web/
 3. Crie um novo projeto para **Cardano Preprod**
 4. Copie a API Key
 
-### 2. Obter o Script Compilado
+### 2. Configurar variáveis de ambiente
+
+1. Copie o arquivo de exemplo:
+```powershell
+Copy-Item .env.example .env
+```
+
+2. Edite o arquivo `.env` e adicione sua API Key:
+```env
+BLOCKFROST_API_KEY=preprodSUA_API_KEY_AQUI
+CARDANO_NETWORK=Preprod
+BLOCKFROST_URL=https://cardano-preprod.blockfrost.io/api/v0
+```
+
+> ⚠️ **Importante:** O arquivo `.env` contém informações sensíveis e não deve ser commitado no git. Ele já está incluído no `.gitignore`.
+
+### 3. Obter o Script Compilado
 
 Depois de executar `aiken build`, o arquivo `plutus.json` é gerado. Você precisa extrair o script compilado:
 
@@ -40,16 +60,9 @@ Get-Content plutus.json | ConvertFrom-Json | ConvertTo-Json -Depth 10
 
 Procure pelo validator `hello_world` e copie o campo `compiledCode`.
 
-### 3. Configurar a aplicação
+### 4. Configurar o validator
 
-No arquivo `js/app.js`, substitua as seguintes configurações:
-
-**API Key do Blockfrost:**
-```javascript
-const BLOCKFROST_API_KEY = "preprodYOUR_API_KEY_HERE"; // Sua API key aqui
-```
-
-**Script compilado do validator:**
+No arquivo `js/app.js`, substitua o script compilado:
 ```javascript
 const validator = {
     type: "PlutusV2",
@@ -57,7 +70,7 @@ const validator = {
 };
 ```
 
-### 4. Obter tADA (Test ADA)
+### 5. Obter tADA (Test ADA)
 
 Para testar na Preprod, você precisa de tADA gratuito:
 
@@ -144,6 +157,20 @@ Lógica de interação com a blockchain:
 - Interação com o validator
 - Gerenciamento de estado
 
+### `js/env.js`
+Carregador de variáveis de ambiente:
+- Lê o arquivo `.env`
+- Disponibiliza configurações de forma segura
+- Evita hardcoded de credenciais
+
+### `.env`
+Arquivo de configuração com informações sensíveis:
+- API Key do Blockfrost
+- Rede Cardano
+- URLs de endpoints
+
+> ⚠️ Este arquivo **NÃO** deve ser commitado no git!
+
 ## 📚 Recursos Adicionais
 
 - [Documentação Lucid](https://github.com/spacebudz/lucid)
@@ -193,10 +220,13 @@ window.minhaNovaFuncao = async function() {
 ## 🔐 Segurança
 
 ⚠️ **Importante:**
-- Nunca compartilhe sua API Key do Blockfrost
-- Use sempre a Preprod Testnet para testes
-- Não envie fundos reais (ADA) para contratos em teste
-- Revise todas as transações antes de assinar
+- ✅ **Use `.env`** para armazenar credenciais (já configurado)
+- ✅ **Nunca commite** o arquivo `.env` (já está no `.gitignore`)
+- ✅ **Compartilhe apenas** o `.env.example`
+- ⚠️ Use sempre a Preprod Testnet para testes
+- ⚠️ Não envie fundos reais (ADA) para contratos em teste
+- ⚠️ Revise todas as transações antes de assinar
+- ⚠️ Não exponha sua API Key em código público
 
 ## 📚 Próximos Passos
 

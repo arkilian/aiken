@@ -2,10 +2,7 @@ import { Lucid, Blockfrost, fromText, Data } from 'https://cdn.jsdelivr.net/npm/
 
 let lucid;
 let contractAddress;
-
-// Configuração do Blockfrost (você precisa adicionar sua API key)
-const BLOCKFROST_URL = "https://cardano-preprod.blockfrost.io/api/v0";
-const BLOCKFROST_API_KEY = "preprodYOUR_API_KEY_HERE"; // ⚠️ Substitua pela sua API key
+let config;
 
 // Dados do validator (você precisa copiar do plutus.json após compilar)
 const validator = {
@@ -14,15 +11,37 @@ const validator = {
 };
 
 /**
+ * Inicializa a configuração carregando as variáveis de ambiente
+ */
+async function initConfig() {
+    try {
+        config = await window.envLoader.load();
+        console.log('✅ Configuração carregada com sucesso');
+    } catch (error) {
+        console.error('❌ Erro ao carregar configuração:', error);
+        showStatus('error', '❌ Erro ao carregar configuração. Verifique se o arquivo .env está configurado corretamente.');
+        throw error;
+    }
+}
+
+/**
  * Conecta a wallet do usuário
  */
 window.connectWallet = async function () {
     try {
+        // Carregar configuração se ainda não foi carregada
+        if (!config) {
+            await initConfig();
+        }
+
         showStatus('info', '⏳ Conectando à wallet...');
 
         lucid = await Lucid.new(
-            new Blockfrost(BLOCKFROST_URL, BLOCKFROST_API_KEY),
-            "Preprod"
+            new Blockfrost(
+                config.BLOCKFROST_URL,
+                config.BLOCKFROST_API_KEY
+            ),
+            config.CARDANO_NETWORK
         );
 
         const api = await window.cardano.nami.enable();
