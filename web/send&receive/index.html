@@ -107,13 +107,18 @@
         <div id="status" class="hidden"></div>
     </div>
 
-    <!-- Lucid Library -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/lucid-cardano@0.10.7/web/mod.js"></script>
-
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
-    <script type="module" src="app.js"></script>
+    <!-- Lucid Library (same version as hello_world) -->
+    <script type="module">
+        import { Blockfrost, Lucid } from "https://cdn.jsdelivr.net/npm/lucid-cardano@0.10.7/web/mod.js";
+        window.Lucid = Lucid;
+        window.Blockfrost = Blockfrost;
+    </script>
+
+    <!-- Main Application -->
+    <script src="app.js"></script>
 </body>
 
 </html>

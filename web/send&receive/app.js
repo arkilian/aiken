@@ -1,8 +1,6 @@
 // Cardano Send & Receive Application
 // Using Lucid library for Cardano blockchain interaction
 
-import { Blockfrost, Lucid } from "https://cdn.jsdelivr.net/npm/lucid-cardano@0.10.7/web/mod.js";
-
 const BLOCKFROST_API_KEY = 'preprodbrFrMHjt5JS8Gr0sup5fQezMh9FFg0eY';
 const NETWORK = 'Preprod';
 
@@ -13,18 +11,33 @@ let walletName = '';
 let walletAddress = '';
 let walletBalance = 0;
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    detectWallets();
-    setupEventListeners();
+// Initialize - wait for Lucid to load
+window.addEventListener('load', () => {
+    console.log('🚀 App initialized');
+    console.log('Lucid available:', typeof window.Lucid !== 'undefined');
+    console.log('Blockfrost available:', typeof window.Blockfrost !== 'undefined');
+
+    // Wait a bit for module to load
+    setTimeout(() => {
+        console.log('After timeout - Lucid:', typeof window.Lucid !== 'undefined');
+        detectWallets();
+        setupEventListeners();
+    }, 1000);
 });
 
 // Detect available wallets
 function detectWallets() {
+    console.log('🔍 Detecting wallets...');
+    console.log('window.cardano:', window.cardano);
+
     const wallets = ['nami', 'eternl', 'lace', 'flint', 'typhon', 'gero'];
     const connectBtn = document.getElementById('connectWallet');
 
+    console.log('Connect button:', connectBtn);
+
     const available = wallets.filter(name => window.cardano && window.cardano[name]);
+
+    console.log('Available wallets:', available);
 
     if (available.length === 0) {
         connectBtn.disabled = true;
@@ -32,20 +45,35 @@ function detectWallets() {
         showStatus('Please install a Cardano wallet (Nami, Eternl, Lace, etc.)', 'error');
     } else {
         connectBtn.textContent = `Connect Wallet (${available.length} available)`;
+        console.log('✅ Wallets detected:', available);
     }
 }
 
 // Setup event listeners
 function setupEventListeners() {
-    document.getElementById('connectWallet').addEventListener('click', connectWallet);
-    document.getElementById('disconnectWallet').addEventListener('click', disconnectWallet);
-    document.getElementById('sendForm').addEventListener('submit', handleSendAda);
-    document.getElementById('copyAddress').addEventListener('click', copyAddress);
-    document.getElementById('refreshTx').addEventListener('click', loadTransactions);
+    console.log('🎯 Setting up event listeners...');
+
+    const connectBtn = document.getElementById('connectWallet');
+    const disconnectBtn = document.getElementById('disconnectWallet');
+    const sendForm = document.getElementById('sendForm');
+    const copyBtn = document.getElementById('copyAddress');
+    const refreshBtn = document.getElementById('refreshTx');
+
+    console.log('Elements:', { connectBtn, disconnectBtn, sendForm, copyBtn, refreshBtn });
+
+    if (connectBtn) {
+        connectBtn.addEventListener('click', connectWallet);
+        console.log('✅ Connect button listener added');
+    }
+    if (disconnectBtn) disconnectBtn.addEventListener('click', disconnectWallet);
+    if (sendForm) sendForm.addEventListener('submit', handleSendAda);
+    if (copyBtn) copyBtn.addEventListener('click', copyAddress);
+    if (refreshBtn) refreshBtn.addEventListener('click', loadTransactions);
 }
 
 // Connect to wallet
 async function connectWallet() {
+    console.log('🔗 Connect wallet clicked!');
     try {
         showStatus('Connecting to wallet...', 'info');
 
@@ -68,9 +96,14 @@ async function connectWallet() {
             throw new Error('No wallet available or connection rejected');
         }
 
+        // Check if Lucid is available
+        if (typeof window.Lucid === 'undefined') {
+            throw new Error('Lucid library not loaded');
+        }
+
         // Initialize Lucid
-        lucid = await Lucid.new(
-            new Blockfrost(
+        lucid = await window.Lucid.new(
+            new window.Blockfrost(
                 'https://cardano-preprod.blockfrost.io/api/v0',
                 BLOCKFROST_API_KEY
             ),
