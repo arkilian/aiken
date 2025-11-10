@@ -1,10 +1,10 @@
-# Tutorial Aiken - Passo a Passo / Aiken Tutorial - Step by Step
+# Tutorial Aiken - Passo a Passo / Aiken Tutorial
 
 Este tutorial guia voc√™ atrav√©s dos fundamentos do Aiken, baseado na documenta√ß√£o oficial.
 
 *This tutorial guides you through the fundamentals of Aiken, based on the official documentation.*
 
-## √ùndice / Table of Contents
+## √çndice / Table of Contents
 
 1. [Instala√ß√£o / Installation](#instala√ß√£o--installation)
 2. [Conceitos B√°sicos / Basic Concepts](#conceitos-b√°sicos--basic-concepts)
@@ -13,7 +13,7 @@ Este tutorial guia voc√™ atrav√©s dos fundamentos do Aiken, baseado na documenta
 5. [Testes / Testing](#testes--testing)
 6. [Pr√≥ximos Passos / Next Steps](#pr√≥ximos-passos--next-steps)
 
-## InstalaÁ„o / Installation
+## Instala√ß√£o / Installation
 
 ### 1. Instalar Aiken / Install Aiken
 
@@ -25,15 +25,15 @@ aikup
 
 **Windows:**
 
-Primeiro, instale o Rust (se ainda n„o tiver):
+Primeiro, instale o Rust (se ainda n√£o tiver):
 ```powershell
 # Instalar Rust via winget
 winget install rustup
 
-# Recarregar as vari·veis de ambiente
+# Recarregar as vari√°veis de ambiente
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
-# Verificar instalaÁ„o do Rust
+# Verificar instala√ß√£o do Rust
 rustup --version
 cargo --version
 ```
@@ -48,12 +48,12 @@ cargo install aiken --locked
 cargo install aiken --locked
 ```
 
-### 2. Verificar InstalaÁ„o / Verify Installation
+### 2. Verificar Instala√ß√£o / Verify Installation
 ```bash
 aiken --version
 ```
 
-**Nota para Windows:** Se o comando `cargo` n„o for reconhecido em uma nova janela do PowerShell, execute:
+**Nota para Windows:** Se o comando `cargo` n√£o for reconhecido em uma nova janela do PowerShell, execute:
 ```powershell
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 ```
@@ -71,22 +71,22 @@ projeto/
     ‚îî‚îÄ‚îÄ seu_validador.ak
 ```
 
-### O que s„o Validadores? / What are Validators?
+### O que s√£o Validadores? / What are Validators?
 
-Validadores s„o smart contracts que verificam se uma transaÁ„o È v·lida. Na vers„o moderna do Aiken (1.1.19+), eles usam m˙ltiplos propÛsitos (handlers) e recebem diferentes par‚metros dependendo do propÛsito:
+Validadores s√£o smart contracts que verificam se uma transa√ß√£o √© v√°lida. Na vers√£o moderna do Aiken (1.1.19+), eles usam m√∫ltiplos prop√≥sitos (handlers) e recebem diferentes par√¢metros dependendo do prop√≥sito:
 
 *Validators are smart contracts that check if a transaction is valid. In modern Aiken (1.1.19+), they use multiple purposes (handlers) and receive different parameters depending on the purpose:*
 
 **Para `spend` (gastar UTxOs):**
 1. **datum: Option<T>**: Dados armazenados no UTxO (opcional)
 2. **redeemer: R**: Dados fornecidos por quem gasta o UTxO
-3. **_utxo: OutputReference**: ReferÍncia ao UTxO sendo gasto
-4. **_self: Transaction**: InformaÁıes sobre a transaÁ„o completa
+3. **_utxo: OutputReference**: Refer√™ncia ao UTxO sendo gasto
+4. **_self: Transaction**: Informa√ß√µes sobre a transa√ß√£o completa
 
 **Para `mint` (cunhar tokens):**
 1. **redeemer**: Dados de cunhagem
-2. **policy_id**: ID da polÌtica de cunhagem
-3. **self**: TransaÁ„o
+2. **policy_id**: ID da pol√≠tica de cunhagem
+3. **self**: Transa√ß√£o
 
 ## Primeiro Validador / First Validator
 
@@ -118,9 +118,9 @@ validator hello_world {
 ```
 
 Este validador:
-- Aceita transaÁıes onde o redeemer contÈm "Hello, World!"
-- Rejeita todas as outras transaÁıes
-- Usa a nova sintaxe do Aiken 1.1.19 com m˙ltiplos propÛsitos
+- Aceita transa√ß√µes onde o redeemer cont√©m "Hello, World!"
+- Rejeita todas as outras transa√ß√µes
+- Usa a nova sintaxe do Aiken 1.1.19 com m√∫ltiplos prop√≥sitos
 
 *This validator:*
 - *Accepts transactions where the redeemer contains "Hello, World!"*
@@ -156,14 +156,14 @@ pub type Pessoa {
   idade: Int,
 }
 
-// Enum type (uni„o de tipos)
+// Enum type (uni√£o de tipos)
 pub type Acao {
   Depositar
   Sacar { quantidade: Int }
 }
 ```
 
-**Importante:** Tipos usados em validators devem ser `pub` (p˙blicos).
+**Importante:** Tipos usados em validators devem ser `pub` (p√∫blicos).
 
 ## Testes / Testing
 
@@ -173,10 +173,10 @@ pub type Acao {
 test meu_teste() {
   // Arrange (preparar)
   let valor = 10
-  
+
   // Act (executar)
   let resultado = valor + 5
-  
+
   // Assert (verificar)
   resultado == 15
 }
@@ -184,8 +184,8 @@ test meu_teste() {
 test validator_teste() {
   let datum = Some(MeuDatum { campo: 10 })
   let redeemer = MeuRedeemer { acao: Incrementar }
-  
-  // Use Void para par‚metros n„o utilizados
+
+  // Use Void para par√¢metros n√£o utilizados
   meu_validator.spend(datum, redeemer, Void, Void)
 }
 ```
@@ -263,17 +263,17 @@ fn processar_acao(acao: Acao) -> Int {
 }
 ```
 
-### Validators com M˙ltiplos PropÛsitos
+### Validators com M√∫ltiplos Prop√≥sitos
 
 ```aiken
 validator meu_validator {
   spend(datum: Option<MeuDatum>, redeemer: MeuRedeemer, _utxo, _self) {
-    // LÛgica para gastar UTxOs
+    // L√≥gica para gastar UTxOs
     True
   }
 
   mint(_redeemer, _policy_id, _self) {
-    // LÛgica para cunhar tokens
+    // L√≥gica para cunhar tokens
     True
   }
 
