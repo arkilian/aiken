@@ -103,6 +103,45 @@ aiken --help   # Ver todos os comandos
 
 ## 🐛 Solução de Problemas Comuns
 
+### ❌ Erro: "spawn aiken ENOENT" - Language Server não inicia
+
+**O que aconteceu:**
+```
+Error: spawn aiken ENOENT
+Aiken Language Server client: couldn't create connection to server
+```
+
+**Solução:** ✅ **JÁ ESTÁ CONFIGURADO!**
+
+O arquivo `.vscode/settings.json` já tem o caminho do Aiken:
+```json
+{
+  "aiken.aikenPath": "C:\\Users\\diogo\\.cargo\\bin\\aiken.exe"
+}
+```
+
+**Para resolver definitivamente:**
+
+1. **Opção 1 - Script Automático (RECOMENDADO):**
+   ```powershell
+   # Execute no terminal do VS Code:
+   .\setup-path.ps1 -User
+   ```
+   Isso adiciona o Cargo bin ao PATH permanentemente.
+
+2. **Opção 2 - Manual:**
+   - Feche o VS Code completamente
+   - Reabra o VS Code
+   - `Ctrl + Shift + P` -> "Reload Window"
+   - O Language Server deve iniciar automaticamente
+
+3. **Opção 3 - Verificar manualmente:**
+   ```powershell
+   # No terminal integrado:
+   where.exe aiken
+   # Deve mostrar: C:\Users\diogo\.cargo\bin\aiken.exe
+   ```
+
 ### Problema: Caracteres especiais aparecem como ��
 **Solução:**
 1. Barra inferior direita do VS Code

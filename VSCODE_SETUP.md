@@ -153,6 +153,24 @@ aiken --version
 
 ## ⚙️ Configurações Avançadas / Advanced Settings
 
+### Script de Configuração Automática do PATH
+
+Para resolver problemas de PATH permanentemente, use o script fornecido:
+
+```powershell
+# Adicionar ao PATH do usuário (recomendado)
+.\setup-path.ps1 -User
+
+# Ou adicionar ao PATH do sistema (requer Administrator)
+.\setup-path.ps1 -System
+```
+
+O script:
+- ✅ Verifica se o Aiken está instalado
+- ✅ Adiciona `C:\Users\diogo\.cargo\bin` ao PATH
+- ✅ Testa se o comando `aiken` funciona
+- ✅ Salva permanentemente (não precisa configurar de novo)
+
 ### Desabilitar formatação automática ao salvar
 Se preferir formatar manualmente:
 
@@ -181,6 +199,42 @@ Se preferir formatar manualmente:
 ---
 
 ## 🐛 Problemas Comuns / Common Issues
+
+### ❌ Erro: "spawn aiken ENOENT" ou Language Server não inicia
+
+**Sintoma:**
+```
+Error: spawn aiken ENOENT
+Couldn't create connection to server
+```
+
+**Causa:** O VS Code não encontra o executável `aiken` no PATH.
+
+**Solução:** ✅ **JÁ CORRIGIDO neste projeto!**
+
+O arquivo `.vscode/settings.json` já está configurado com o caminho correto:
+```json
+{
+  "aiken.aikenPath": "C:\\Users\\diogo\\.cargo\\bin\\aiken.exe"
+}
+```
+
+**Se o erro persistir:**
+
+1. **Verifique se o caminho está correto:**
+   ```powershell
+   # No terminal integrado do VS Code:
+   where.exe aiken
+   ```
+
+2. **Atualize o caminho em `.vscode/settings.json`:**
+   - Se o caminho for diferente, altere `aiken.aikenPath`
+
+3. **Recarregue o VS Code:**
+   - `Ctrl + Shift + P` -> "Reload Window"
+
+4. **Reinicie o Language Server:**
+   - `Ctrl + Shift + P` -> "Aiken: Restart Language Server"
 
 ### Extensão não está funcionando
 ```bash
