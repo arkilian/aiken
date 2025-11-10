@@ -18,24 +18,20 @@ validator counter {
   spend(datum: Option<CounterDatum>, redeemer: CounterRedeemer, _utxo, _self) {
     // Extract datum if present
     expect Some(dat) = datum
-    
     // Pattern match on the redeemer to determine action
     when redeemer is {
-      Increment -> {
+      Increment ->
         // Counter can only increment
         // In a real validator, you would check the output datum
         // to ensure it's dat.count + 1
         True
-      }
-      Decrement -> {
+      Decrement ->
         // Counter can only decrement if > 0
         // In a real validator, you would check the output datum
         dat.count > 0
-      }
-      Reset -> {
+      Reset ->
         // Can always reset
         True
-      }
     }
   }
 

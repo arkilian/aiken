@@ -88,6 +88,21 @@ aiken check
 aiken fmt
 ```
 
+## 🎨 Configuração do VS Code / VS Code Setup
+
+**⚠️ IMPORTANTE:** Para melhor experiência de desenvolvimento, veja `VSCODE_SETUP.md`
+
+*IMPORTANT: For the best development experience, see `VSCODE_SETUP.md`*
+
+**Já configurado neste projeto / Already configured in this project:**
+- ✅ Extensão Aiken instalada
+- ✅ UTF-8 encoding
+- ✅ Syntax highlighting para `.ak`
+- ✅ Formatação automática
+- ✅ IntelliSense ativo
+
+**Apenas recarregue o VS Code:** Ctrl + Shift + P -> "Reload Window"
+
 ## Exemplos / Examples
 
 ### Hello World Validator
